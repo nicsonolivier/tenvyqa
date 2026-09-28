@@ -21,7 +21,7 @@ Never expose these values through `VITE_*` variables or browser code.
 
 Customer -> WhatsApp -> Meta webhook -> identify phone_number_id -> barbershop -> customer -> conversation -> persist inbound message -> check AI/Human mode -> AI orchestrator -> validated actions -> outbound WhatsApp response.
 
-If the conversation is in Human mode, automatic AI replies stop.
+If the conversation is in Human mode, automatic AI replies stop.\n\nOutbound AI messages are persisted first, then the internal whatsapp-send function delivers them through Meta and stores the returned wamid. Delivery/read status callbacks update that same message.\n\nCurrent outbound scope is text messages inside the active customer-service conversation. Template initiation outside the customer-service window is a separate feature and must not be silently substituted.
 
 ## Production requirement
 

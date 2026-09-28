@@ -1,5 +1,5 @@
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
-const URL=Deno.env.get("SUPABASE_URL")!,KEY=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,VERIFY=Deno.env.get("WHATSAPP_VERIFY_TOKEN")!,APP_SECRET=Deno.env.get("META_APP_SECRET")!;
+const URL=Deno.env.get("SUPABASE_URL")!,KEY=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,VERIFY=Deno.env.get("WHATSAPP_VERIFY_TOKEN")!,APP_SECRET=Deno.env.get("META_APP_SECRET")!,INTERNAL=Deno.env.get("TENVYQA_INTERNAL_SECRET")!;
 const db=createClient(URL,KEY);
 const enc=new TextEncoder();
 function hex(b:ArrayBuffer){return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
@@ -21,7 +21,7 @@ Deno.serve(async req=>{try{
    if(!customer){const created=await db.from("customers").insert({barbershop_id:wa.barbershop_id,whatsapp_phone:m.from,name:customerName}).select("id,name").single();if(created.error)throw created.error;customer=created.data}else if(!customer.name&&customerName)await db.from("customers").update({name:customerName,updated_at:new Date().toISOString()}).eq("id",customer.id);
    let{data:conv}=await db.from("conversations").select("id,mode,unread_count").eq("barbershop_id",wa.barbershop_id).eq("customer_id",customer.id).maybeSingle();
    if(!conv){const created=await db.from("conversations").insert({barbershop_id:wa.barbershop_id,customer_id:customer.id,mode:"ai",unread_count:1,last_message_at:new Date().toISOString()}).select("id,mode,unread_count").single();if(created.error)throw created.error;conv=created.data}else await db.from("conversations").update({last_message_at:new Date().toISOString(),unread_count:(conv.unread_count??0)+1,updated_at:new Date().toISOString()}).eq("id",conv.id);
-   const ins=await db.from("messages").insert({barbershop_id:wa.barbershop_id,conversation_id:conv.id,direction:"inbound",source:"customer",body:bodyText,external_message_id:m.id,status:"received"});if(ins.error&&ins.error.code!=="23505")throw ins.error;
+   const ins=await db.from("messages").insert({barbershop_id:wa.barbershop_id,conversation_id:conv.id,direction:"inbound",source:"customer",body:bodyText,external_message_id:m.id,status:"received"});if(ins.error&&ins.error.code!=="23505")throw ins.error;if(!ins.error&&conv.mode==="ai"){const ar=await fetch(`${URL}/functions/v1/ai-orchestrator`,{method:"POST",headers:{"Content-Type":"application/json","x-tenvyqa-internal-secret":INTERNAL},body:JSON.stringify({conversation_id:conv.id,message:bodyText})});if(ar.ok){const out=await ar.json();if(out.message_id)await fetch(`${URL}/functions/v1/whatsapp-send`,{method:"POST",headers:{"Content-Type":"application/json","x-tenvyqa-internal-secret":INTERNAL},body:JSON.stringify({message_id:out.message_id})})}else console.error("AI orchestration failed",ar.status)}
   }
  }
  return new Response("EVENT_RECEIVED",{status:200});
