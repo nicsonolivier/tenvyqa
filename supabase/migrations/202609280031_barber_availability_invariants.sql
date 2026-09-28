@@ -4,7 +4,7 @@ delete from public.barber_availability a
 using public.barber_availability b
 where a.barber_id=b.barber_id
   and a.weekday=b.weekday
-  and a.id>b.id;
+  and (a.created_at>b.created_at or (a.created_at=b.created_at and a.id>b.id));
 
 create unique index if not exists barber_availability_one_interval_per_day
 on public.barber_availability(barber_id,weekday);
