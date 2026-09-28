@@ -1,0 +1,23 @@
+begin;
+-- Final privilege hardening for SECURITY DEFINER helpers used by backend workers.
+revoke all on function public.get_available_slots_internal(uuid,uuid,uuid,date,integer) from public,anon,authenticated;
+grant execute on function public.get_available_slots_internal(uuid,uuid,uuid,date,integer) to service_role;
+revoke all on function public.create_appointment_internal(uuid,uuid,uuid,uuid,timestamptz,text) from public,anon,authenticated;
+grant execute on function public.create_appointment_internal(uuid,uuid,uuid,uuid,timestamptz,text) to service_role;
+revoke all on function public.claim_outbound_message(uuid) from public,anon,authenticated;
+grant execute on function public.claim_outbound_message(uuid) to service_role;
+revoke all on function public.release_outbound_message(uuid,boolean,text) from public,anon,authenticated;
+grant execute on function public.release_outbound_message(uuid,boolean,text) to service_role;
+revoke all on function public.apply_whatsapp_message_status(uuid,text,text,timestamptz) from public,anon,authenticated;
+grant execute on function public.apply_whatsapp_message_status(uuid,text,text,timestamptz) to service_role;
+revoke all on function public.get_retryable_outbox(integer) from public,anon,authenticated;
+grant execute on function public.get_retryable_outbox(integer) to service_role;
+revoke all on function public.fail_expired_freeform_message(uuid) from public,anon,authenticated;
+grant execute on function public.fail_expired_freeform_message(uuid) to service_role;
+revoke all on function public.claim_due_appointment_notifications(integer) from public,anon,authenticated;
+grant execute on function public.claim_due_appointment_notifications(integer) to service_role;
+revoke all on function public.finish_appointment_notification(uuid,text,uuid,text) from public,anon,authenticated;
+grant execute on function public.finish_appointment_notification(uuid,text,uuid,text) to service_role;
+revoke all on function public.ensure_appointment_notification_message(uuid,uuid,text,text) from public,anon,authenticated;
+grant execute on function public.ensure_appointment_notification_message(uuid,uuid,text,text) to service_role;
+commit;
