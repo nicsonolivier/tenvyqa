@@ -1,0 +1,3 @@
+drop policy if exists "members read barbershops" on public.barbershops;
+create policy "members read barbershops" on public.barbershops for select using(public.is_barbershop_member(id));
+create policy "admins update barbershops" on public.barbershops for update using(public.has_barbershop_role(id,array['owner','manager']::public.member_role[])) with check(public.has_barbershop_role(id,array['owner','manager']::public.member_role[]));
