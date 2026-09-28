@@ -57,6 +57,22 @@ No TENVYQA, Owner/Manager informa Phone Number ID e WABA ID, verifica a conexão
 
 Nunca marque o sistema como pronto para produção se os workers não estiverem efetivamente agendados.
 
+### Cadência recomendada
+
+No projeto hospedado, habilite Supabase Cron e configure chamadas HTTP POST autenticadas para:
+- `whatsapp-retry-worker`: a cada 1 minuto;
+- `appointment-notification-worker`: a cada 1 minuto.
+
+Use a autenticação interna já definida para os workers e mantenha as credenciais somente no ambiente hospedado. Não versione valores de autenticação em migrations, SQL, documentação ou frontend.
+
+Após ativar os jobs, valide no histórico do Cron:
+1. execuções recorrentes dos dois workers;
+2. ausência de falhas persistentes;
+3. retry real de uma mensagem temporariamente falha;
+4. processamento de confirmação/lembrete em uma barbearia de teste.
+
+A presença destas instruções no repositório não significa que o scheduler esteja ativo; confirme o estado no ambiente hospedado antes do go-live.
+
 ## 8. Teste end-to-end obrigatório
 Em uma barbearia de teste:
 1. criar serviço e barbeiro;
