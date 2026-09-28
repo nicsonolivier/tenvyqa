@@ -1,1 +1,25 @@
 project_id = "tenvyqa"
+
+[functions.whatsapp-webhook]
+verify_jwt = false
+
+[functions.ai-orchestrator]
+verify_jwt = false
+
+[functions.whatsapp-send]
+verify_jwt = false
+
+[functions.whatsapp-retry-worker]
+verify_jwt = false
+
+[functions.appointment-notification-worker]
+verify_jwt = false
+
+[functions.whatsapp-human-send]
+verify_jwt = true
+
+[functions.whatsapp-verify]
+verify_jwt = true
+
+[functions.whatsapp-template-sync]
+verify_jwt = true
