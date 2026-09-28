@@ -19,8 +19,8 @@ Deno.serve(async req=>{try{
    const contact=value.contacts?.find((c:any)=>c.wa_id===m.from);const customerName=contact?.profile?.name||null;
    let{data:customer}=await db.from("customers").select("id,name").eq("barbershop_id",wa.barbershop_id).eq("whatsapp_phone",m.from).maybeSingle();
    if(!customer){const created=await db.from("customers").insert({barbershop_id:wa.barbershop_id,whatsapp_phone:m.from,name:customerName}).select("id,name").single();if(created.error)throw created.error;customer=created.data}else if(!customer.name&&customerName)await db.from("customers").update({name:customerName,updated_at:new Date().toISOString()}).eq("id",customer.id);
-   let{data:conv}=await db.from("conversations").select("id,mode").eq("barbershop_id",wa.barbershop_id).eq("customer_id",customer.id).maybeSingle();
-   if(!conv){const created=await db.from("conversations").insert({barbershop_id:wa.barbershop_id,customer_id:customer.id,mode:"ai",unread_count:1,last_message_at:new Date().toISOString()}).select("id,mode").single();if(created.error)throw created.error;conv=created.data}else await db.from("conversations").update({last_message_at:new Date().toISOString(),unread_count:db.rpc?undefined:undefined}).eq("id",conv.id);
+   let{data:conv}=await db.from("conversations").select("id,mode,unread_count").eq("barbershop_id",wa.barbershop_id).eq("customer_id",customer.id).maybeSingle();
+   if(!conv){const created=await db.from("conversations").insert({barbershop_id:wa.barbershop_id,customer_id:customer.id,mode:"ai",unread_count:1,last_message_at:new Date().toISOString()}).select("id,mode,unread_count").single();if(created.error)throw created.error;conv=created.data}else await db.from("conversations").update({last_message_at:new Date().toISOString(),unread_count:(conv.unread_count??0)+1,updated_at:new Date().toISOString()}).eq("id",conv.id);
    const ins=await db.from("messages").insert({barbershop_id:wa.barbershop_id,conversation_id:conv.id,direction:"inbound",source:"customer",body:bodyText,external_message_id:m.id,status:"received"});if(ins.error&&ins.error.code!=="23505")throw ins.error;
   }
  }
