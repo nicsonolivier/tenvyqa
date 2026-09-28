@@ -1,24 +1,22 @@
 # TENVYQA AI Orchestrator
 
-Supabase Edge Function that connects TENVYQA conversations to the OpenAI Responses API.
+Supabase Edge Function server-to-server que conecta conversas TENVYQA à OpenAI Responses API.
 
-## Required Supabase secrets
+## Secrets
+- OPENAI_API_KEY
+- OPENAI_MODEL (opcional)
+- TENVYQA_INTERNAL_SECRET
+- SUPABASE_URL
+- SUPABASE_SERVICE_ROLE_KEY
 
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL` (optional; defaults to `gpt-5.4-mini`)
-- `TENVYQA_INTERNAL_SECRET`
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
+## Fluxo
+1. O webhook persiste o inbound.
+2. Chama o orquestrador com `conversation_id` e `inbound_message_id`.
+3. O orquestrador valida que a mensagem pertence à conversa e é inbound do cliente.
+4. Carrega histórico, configurações e FAQ.
+5. A OpenAI pode solicitar somente as tools declaradas.
+6. Ações operacionais são revalidadas no backend/banco.
+7. A resposta final é persistida uma vez em `messages`.
+8. O transporte WhatsApp é feito por `whatsapp-send`.
 
-The function is intentionally server-to-server. Do not call it directly from the browser and never expose these secrets through `VITE_*` variables.
-
-## Flow
-
-1. Trusted webhook/backend supplies `conversation_id` and the inbound message.
-2. Function verifies conversation is still in AI mode.
-3. Recent history and barbershop AI settings are loaded.
-4. OpenAI can request only the declared TENVYQA tools.
-5. Tool inputs are validated again by database-backed actions.
-6. Appointment creation uses collision-safe server-side SQL.
-7. Final AI reply is persisted to `messages`.
-8. WhatsApp delivery will be handled by the WhatsApp webhook/send layer.
+Nunca chame esta função diretamente do browser.
