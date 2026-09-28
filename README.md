@@ -2,7 +2,7 @@
 
 **Atendimento inteligente. Sua barbearia nunca para.**
 
-TENVYQA Business é uma plataforma SaaS criada exclusivamente para barbearias, com atendimento inteligente pelo WhatsApp, gestão de conversas, clientes, barbeiros, serviços, agenda e agendamentos.
+TENVYQA Business é uma plataforma criada exclusivamente para barbearias, com atendimento inteligente pelo WhatsApp, gestão de conversas, clientes, barbeiros, serviços, agenda e agendamentos.
 
 ## Plataformas
 
