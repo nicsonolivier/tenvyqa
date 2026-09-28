@@ -10,7 +10,7 @@ Deno.serve(async req=>{try{
  if(req.method==="GET"){const u=new URL(req.url);if(u.searchParams.get("hub.mode")==="subscribe"&&u.searchParams.get("hub.verify_token")===VERIFY)return new Response(u.searchParams.get("hub.challenge")||"",{status:200});return new Response("Forbidden",{status:403})}
  if(req.method!=="POST")return new Response("Method not allowed",{status:405});
  const raw=await req.text();if(!await valid(raw,req.headers.get("x-hub-signature-256")))return new Response("Unauthorized",{status:401});
- const body=JSON.parse(raw);
+ const body=JSON.parse(raw);if(body.object!=="whatsapp_business_account")return new Response("EVENT_RECEIVED",{status:200});
  for(const entry of body.entry??[])for(const change of entry.changes??[]){if(change.field!=="messages")continue;const value=change.value??{};const phoneId=value.metadata?.phone_number_id;if(!phoneId)continue;
   const{data:wa}=await db.from("whatsapp_settings").select("barbershop_id").eq("phone_number_id",phoneId).maybeSingle();if(!wa)continue;
   for(const st of value.statuses??[]){if(st.id&&st.status){const eventAt=st.timestamp?new Date(Number(st.timestamp)*1000).toISOString():new Date().toISOString();await db.rpc("apply_whatsapp_message_status",{p_barbershop:wa.barbershop_id,p_external_message_id:st.id,p_status:st.status,p_event_at:eventAt})}}
