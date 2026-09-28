@@ -13,7 +13,7 @@ Deno.serve(async req=>{try{
  const body=JSON.parse(raw);
  for(const entry of body.entry??[])for(const change of entry.changes??[]){if(change.field!=="messages")continue;const value=change.value??{};const phoneId=value.metadata?.phone_number_id;if(!phoneId)continue;
   const{data:wa}=await db.from("whatsapp_settings").select("barbershop_id").eq("phone_number_id",phoneId).maybeSingle();if(!wa)continue;
-  for(const st of value.statuses??[]){if(st.id&&st.status)await db.from("messages").update({status:st.status}).eq("external_message_id",st.id).eq("barbershop_id",wa.barbershop_id)}
+  for(const st of value.statuses??[]){if(st.id&&st.status){const eventAt=st.timestamp?new Date(Number(st.timestamp)*1000).toISOString():new Date().toISOString();await db.rpc("apply_whatsapp_message_status",{p_barbershop:wa.barbershop_id,p_external_message_id:st.id,p_status:st.status,p_event_at:eventAt})}}
   for(const m of value.messages??[]){if(!m.id||!m.from)continue;const bodyText=textOf(m);if(!bodyText)continue;
    const{data:existing}=await db.from("messages").select("id").eq("external_message_id",m.id).maybeSingle();if(existing)continue;
    const contact=value.contacts?.find((c:any)=>c.wa_id===m.from);const customerName=contact?.profile?.name||null;
