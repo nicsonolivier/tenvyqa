@@ -1,5 +1,17 @@
 begin;
 
+-- Make the migration safe for existing databases that may already contain duplicate phones.
+-- Keep the oldest profile's phone and clear only later duplicates before enforcing uniqueness.
+with ranked as (
+ select id,row_number() over(partition by phone order by created_at,id) as rn
+ from public.profiles
+ where phone is not null
+)
+update public.profiles p
+set phone=null,updated_at=now()
+from ranked r
+where p.id=r.id and r.rn>1;
+
 create unique index if not exists profiles_phone_unique_idx
 on public.profiles(phone)
 where phone is not null;
