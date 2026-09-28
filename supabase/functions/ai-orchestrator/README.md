@@ -5,7 +5,7 @@ Supabase Edge Function that connects TENVYQA conversations to the OpenAI Respons
 ## Required Supabase secrets
 
 - `OPENAI_API_KEY`
-- `OPENAI_MODEL` (optional; defaults to `gpt-6-luna`)
+- `OPENAI_MODEL` (optional; defaults to `gpt-5.4-mini`)
 - `TENVYQA_INTERNAL_SECRET`
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`

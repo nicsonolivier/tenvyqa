@@ -1,5 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const OPENAI_API_KEY=Deno.env.get("OPENAI_API_KEY")!;const MODEL=Deno.env.get("OPENAI_MODEL")||"gpt-6-luna";const SUPABASE_URL=Deno.env.get("SUPABASE_URL")!;const SERVICE_KEY=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const OPENAI_API_KEY=Deno.env.get("OPENAI_API_KEY")!;const MODEL=Deno.env.get("OPENAI_MODEL")||"gpt-5.4-mini";const SUPABASE_URL=Deno.env.get("SUPABASE_URL")!;const SERVICE_KEY=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const db=createClient(SUPABASE_URL,SERVICE_KEY);
 const tools=[
 {type:"function",name:"get_services",description:"List active services with real prices and durations.",parameters:{type:"object",properties:{},additionalProperties:false}},
